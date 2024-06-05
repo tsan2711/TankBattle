@@ -10,7 +10,7 @@ public class PlayerAim : NetworkBehaviour
     [SerializeField] private Transform turretTransform;
 
     private void LateUpdate() {
-        if( !IsOwner ){ return; }
+        if(!IsOwner){return;}
         UnityEngine.Vector2 aimScreenPosition = inputReader.AimPosition;
         UnityEngine.Vector2 aimWorldPosition = Camera.main.ScreenToWorldPoint(aimScreenPosition);
 

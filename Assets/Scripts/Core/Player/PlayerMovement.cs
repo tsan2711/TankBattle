@@ -14,8 +14,7 @@ public class PlayerMovement : NetworkBehaviour
     private InputReader inputReader;
     [SerializeField]
     private Transform playerBody;
-        [SerializeField]
-    private Transform playerTurret;
+
     [SerializeField]
     private Rigidbody2D rb;
 
@@ -66,14 +65,7 @@ public class PlayerMovement : NetworkBehaviour
         float zRotation = previousMovementInput.x * (-turningRate) * Time.deltaTime;
         playerBody.Rotate(0f,0f, zRotation);
 
-        // Rotate Turret
-        UnityEngine.Vector2 direction = (UnityEngine.Vector2)previousMousePosition - (UnityEngine.Vector2)playerTurret.position;
-        float angle = CalculateAngleWithYAxis(direction);
-        playerTurret.rotation = UnityEngine.Quaternion.Euler(0, 0, angle);
+
     }
-    float CalculateAngleWithYAxis(UnityEngine.Vector2 vector)
-    {
-        float angle = - Mathf.Atan2(vector.x, vector.y) * Mathf.Rad2Deg;
-        return angle;
-    }
+
 }
