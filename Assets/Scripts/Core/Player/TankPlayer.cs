@@ -11,12 +11,18 @@ public class TankPlayer : NetworkBehaviour
     [Header("References")]
     [SerializeField] 
     private CinemachineVirtualCamera followCam;
+    [SerializeField] 
+    private SpriteRenderer minimapIconRenderer;
     [field: SerializeField] 
+
     public Health Health {get; private set; }
+    [field: SerializeField]
+    public CoinWallet CoinWallet {get; private set; }
     [Header("Settings")]
 
     [SerializeField] 
     private int camPriority = 15;
+    [SerializeField] private Color minimapIconColor;
 
     public static event Action<TankPlayer> OnPlayerSpawned;
     public static event Action<TankPlayer> OnPlayerDespawned;
@@ -32,6 +38,7 @@ public class TankPlayer : NetworkBehaviour
         }
         if(IsOwner){
             followCam.Priority = camPriority;
+            minimapIconRenderer.color = minimapIconColor;
         }
     }
 

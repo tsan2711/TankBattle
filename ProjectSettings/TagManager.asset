@@ -13,7 +13,7 @@ TagManager:
   - UI
   - Projectile
   - Pickup
-  - 
+  - Minimap
   - 
   - 
   - 
@@ -40,6 +40,9 @@ TagManager:
   m_SortingLayers:
   - name: Background
     uniqueID: 2695194865
+    locked: 0
+  - name: SuppliesUi
+    uniqueID: 1571966835
     locked: 0
   - name: Default
     uniqueID: 0

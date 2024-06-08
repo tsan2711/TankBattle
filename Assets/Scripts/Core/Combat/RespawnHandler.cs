@@ -7,7 +7,8 @@ using Unity.Services.Lobbies.Models;
 
 public class RespawnHandler : NetworkBehaviour
 {
-    [SerializeField] private NetworkObject playerPrefab;
+    [SerializeField] private TankPlayer playerPrefab;
+    [SerializeField] private float keptCoinPercentAfterDie = 50;
     public override void OnNetworkSpawn()
     {
         if(!IsServer){return;}
@@ -41,19 +42,20 @@ public class RespawnHandler : NetworkBehaviour
 
     private void HandlePlayerDie(TankPlayer player)
     {
+        int coinAfterLose = player.CoinWallet.TotalCoin.Value * (int)(keptCoinPercentAfterDie / 100);
         Destroy(player.gameObject);
-
-        StartCoroutine(RespawningPlayer(player.OwnerClientId));
+        // losing coins
+        StartCoroutine(RespawningPlayer(player.OwnerClientId, coinAfterLose));
     }
 
-    IEnumerator RespawningPlayer(ulong ownerClientId)
+    IEnumerator RespawningPlayer(ulong ownerClientId, int coinAfterLose)
     {
         yield return new WaitForSecondsRealtime(1);
 
-        NetworkObject newPlayer = 
+        TankPlayer newPlayer = 
             Instantiate(playerPrefab, SpawnPoint.GetRandomSpawnPoint(), Quaternion.identity);
-        
-        newPlayer.SpawnAsPlayerObject(ownerClientId);
 
+        newPlayer.NetworkObject.SpawnAsPlayerObject(ownerClientId);
+        newPlayer.CoinWallet.TotalCoin.Value += coinAfterLose;
     }
 }

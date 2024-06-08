@@ -2,11 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 
 public class NetworkServer : MonoBehaviour, IDisposable
 {
     private NetworkManager networkManager;
+
+    public Action<string> OnClientLeft;
+
     private Dictionary<ulong, string> clientIdToAuth = new Dictionary<ulong, string>();
     private Dictionary<string, UserData> authIdToUserData = new Dictionary<string, UserData>();
     public NetworkServer(NetworkManager networkManager){
@@ -14,6 +18,14 @@ public class NetworkServer : MonoBehaviour, IDisposable
 
         networkManager.ConnectionApprovalCallback += ApprovalCheck;
         networkManager.OnServerStarted += OnNetWorkReady;
+    }
+    public bool OpenConnection(string ip, int port)
+    {
+        UnityTransport transport = networkManager.gameObject.GetComponent<UnityTransport>();
+        transport.SetConnectionData(ip, (ushort)port);
+        
+        
+        return networkManager.StartServer();
     }
 
     private void OnNetWorkReady()
@@ -26,6 +38,7 @@ public class NetworkServer : MonoBehaviour, IDisposable
         if(clientIdToAuth.TryGetValue(clientId, out string authId)){
             clientIdToAuth.Remove(clientId);
             authIdToUserData.Remove(authId);
+            OnClientLeft?.Invoke(authId);
         }
     }
 
@@ -70,4 +83,6 @@ public class NetworkServer : MonoBehaviour, IDisposable
         }
         return null;
     }
+
+
 }

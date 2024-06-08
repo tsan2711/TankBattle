@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class LeaderBoard : NetworkBehaviour
@@ -12,8 +13,11 @@ public class LeaderBoard : NetworkBehaviour
     [SerializeField] 
     private LeaderBoardEntityDisplay leaderBoardEntityPrefab;
 
+    [SerializeField] 
+    private int entityToDisplay = 7;
     private NetworkList<LeaderEntityState> leaderBoardEntities;
     private List<LeaderBoardEntityDisplay> entityDisplays = new List<LeaderBoardEntityDisplay>();
+
 
     private void Awake() {
         leaderBoardEntities = new NetworkList<LeaderEntityState>();
@@ -30,6 +34,7 @@ public class LeaderBoard : NetworkBehaviour
                     Value = entity
                 });
             }
+            
         }
         if(IsServer){
             TankPlayer[] players = FindObjectsByType<TankPlayer>(FindObjectsSortMode.None);
@@ -60,6 +65,8 @@ public class LeaderBoard : NetworkBehaviour
             PlayerName = player.PlayerName.Value,
             Coins = 0
         });
+        player.CoinWallet.TotalCoin.OnValueChanged += (oldCoins, newCoins) => 
+            HandleCoinChanged(player.OwnerClientId, newCoins);
     }
 
     private void HandlePlayerDespawned(TankPlayer player){
@@ -71,6 +78,8 @@ public class LeaderBoard : NetworkBehaviour
             leaderBoardEntities.Remove(entity);
             break;
         }
+        player.CoinWallet.TotalCoin.OnValueChanged -= (oldCoins, newCoins) => 
+            HandleCoinChanged(player.OwnerClientId, newCoins);
     }
 
 
@@ -106,7 +115,42 @@ public class LeaderBoard : NetworkBehaviour
                     displayToUpdate.UpdateCoins(changeEvent.Value.Coins);
                 }
                 break;
+        }
         
+        entityDisplays.Sort((x, y) => y.Coins.CompareTo(x.Coins));
+
+        for (int i = 0; i < entityDisplays.Count; i++)
+        {
+            entityDisplays[i].transform.SetSiblingIndex(i);
+            entityDisplays[i].UpdateText();
+            bool shouldShow = i <= entityToDisplay - 1;
+            entityDisplays[i].gameObject.SetActive(shouldShow);
+        }
+        
+        LeaderBoardEntityDisplay myDisplay = entityDisplays.FirstOrDefault(x => x.ClientId == NetworkManager.Singleton.LocalClientId);
+        if(myDisplay != null){
+            if(myDisplay.transform.GetSiblingIndex() >= entityToDisplay){
+                leaderBoardEntityHolder.GetChild(entityToDisplay - 1).gameObject.SetActive(false);
+                myDisplay.gameObject.SetActive(true);
+                
+            }
+        }
+    }
+
+    private void HandleCoinChanged(ulong clientId, int newCoin)
+    {
+        // if(!IsServer){return;}   
+
+        for (int i = 0; i < leaderBoardEntities.Count; i++)
+        {
+            if(leaderBoardEntities[i].ClientId != clientId){continue;}
+
+            leaderBoardEntities[i] = new LeaderEntityState {
+                ClientId = leaderBoardEntities[i].ClientId,
+                PlayerName = leaderBoardEntities[i].PlayerName,
+                Coins = newCoin
+            };
+            return;
         }
     }
 
