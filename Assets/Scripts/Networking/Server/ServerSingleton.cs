@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Netcode;
 using Unity.Services.Core;
 using UnityEngine;
 
@@ -27,7 +28,12 @@ public class ServerSingleton : MonoBehaviour
 
     public async Task CreateServer(){
         await UnityServices.InitializeAsync();
-        GameManager = new ServerGameManager();
+        GameManager = new ServerGameManager(
+            ApplicationData.IP(),
+            ApplicationData.Port(),
+            ApplicationData.QPort(),
+            NetworkManager.Singleton
+        );
     }
 
     private void OnDestroy() {

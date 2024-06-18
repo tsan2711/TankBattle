@@ -32,7 +32,8 @@ public class ServerGameManager : IDisposable
     }
     public void Dispose()
     {
-        throw new NotImplementedException();
+        networkServer?.Dispose();
+        multiplayAllocationService?.Dispose();
     }
 
 
