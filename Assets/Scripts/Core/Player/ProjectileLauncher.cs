@@ -62,8 +62,6 @@ public class ProjectileLauncher : NetworkBehaviour
 
         if(wallet.TotalCoin.Value < costToFire){ return; }
 
-        wallet.SpendingCoin(costToFire);
-
         PrimaryFireServerRpc(projectileSpawnPoint.position, projectileSpawnPoint.up);
 
         SpawnDummyProjectile(projectileSpawnPoint.position, projectileSpawnPoint.up);
