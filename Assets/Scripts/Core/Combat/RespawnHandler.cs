@@ -56,6 +56,6 @@ public class RespawnHandler : NetworkBehaviour
             Instantiate(playerPrefab, SpawnPoint.GetRandomSpawnPoint(), Quaternion.identity);
 
         newPlayer.NetworkObject.SpawnAsPlayerObject(ownerClientId);
-        newPlayer.CoinWallet.TotalCoin.Value += coinAfterLose;
+        newPlayer.CoinWallet.TotalCoin.Value -= coinAfterLose;
     }
 }

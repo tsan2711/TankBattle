@@ -87,7 +87,7 @@ public class HealingZone : NetworkBehaviour
     private void OnTriggerExit2D(Collider2D other)
     {
         if (!IsServer) { return; }
-        if (other.attachedRigidbody.TryGetComponent<TankPlayer>(out TankPlayer player)) { return; }
+        if (!other.attachedRigidbody.TryGetComponent<TankPlayer>(out TankPlayer player)) { return; }
         playersInZone.Remove(player);
     }
 
